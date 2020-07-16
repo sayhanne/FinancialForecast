@@ -5,7 +5,7 @@
 
 from Model import LR
 from datamanipulator import Manager
-from HannesTool import HannesTool
+from hannestool import HannesTool
 
 
 class Main:
@@ -15,6 +15,8 @@ class Main:
         regression = LR()
         regression.getData(manager)
         regression.gradientDescent(5)
+        class_error = regression.get_best_for_class()
+        print(class_error)
         return
 
 

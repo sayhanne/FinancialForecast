@@ -1,4 +1,4 @@
-from HannesTool import HannesTool
+from hannestool import HannesTool
 from sklearn import linear_model
 import math
 class LR:
@@ -85,3 +85,29 @@ class LR:
 
     def getColumn(self, matrix, i):
         return [row[i] for row in matrix]
+    
+    def get_correctness(self):
+        errors = []
+        for weight_index in range(len(self.weightArrays)):
+            test_data = self.data_BigTest[(weight_index * 8) : ((weight_index + 1) * 8)]
+            weights = self.weightArrays[weight_index]
+            #print(weights, weight_index, test_data, "\n\n")
+            error = HannesTool().get_err("Class", weights, test_data)
+            errors.append(error)
+        print("errors:", errors)
+        return sum(errors)/len(errors)
+
+    def get_best_for_class(self):
+        errors = []
+        max_index = 0
+        max_correctness = 0
+        for weight_index in range(len(self.weightArrays)):
+            weights = self.weightArrays[weight_index]
+            #print(weights, weight_index, test_data, "\n\n")
+            correctness = HannesTool().get_err("Class", weights, self.data_BigTest)
+            if(max_correctness < correctness):
+                max_index = weight_index
+                max_correctness = correctness
+            errors.append(correctness)
+        print("best", self.weightArrays[max_index],"correctness:", max_correctness)
+        return sum(errors)/len(errors)

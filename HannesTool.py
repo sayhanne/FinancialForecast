@@ -57,10 +57,10 @@ class HannesTool:
             # estimation yani fx oluşturuluyor
             estimation = 0
             for w_index in enumerate(weights):
-                if w_index == 0:
-                    estimation = weights[w_index]
+                if w_index[0] == 0:
+                    estimation = w_index[1]
                 else:
-                    estimation += test_sample[w_index - 1] * weights[w_index]
+                    estimation += test_sample[w_index[0] - 1] * w_index[1]
             #### hesap kısmı
             target = test_sample[-1]
             if target * estimation > 0:
