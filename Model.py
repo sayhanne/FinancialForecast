@@ -1,4 +1,4 @@
-from hannestool import HannesTool
+from HannesTool import HannesTool
 from sklearn import linear_model
 import math
 class LR:
@@ -7,11 +7,11 @@ class LR:
         self.lr = None
         self.parameters = []
         self.lasso = None
+        self.lassoParams = []
         self.tool = HannesTool()
         self.data_BigTrain = None
         self.data_BigTest = None
         self.weightArrays = []
-        self.mseArray = []
         self.numberOfPredictors = 0
         self.data = None
         self.target = None
@@ -31,32 +31,44 @@ class LR:
         completed = False
         count = 0
         while not completed:
+            print("iteration-->", count + 1)
             self.data, self.target, self.data_test, self.target_test = self.getPiece()
             self.lr = linear_model.LinearRegression()
+            self.lasso = linear_model.Lasso()
             self.lr.fit(self.data, self.target)
+            self.lasso.fit(self.data, self.target)
             self.estimationForTest = self.lr.predict(self.data_test)
             rmse = self.rmse()
-            print("iteration-->", count + 1)
-            print("intercept-->", self.lr.intercept_)
-            print("coefficients-->", self.lr.coef_)
+            self.estimationForTest = self.lasso.predict(self.data_test)
+            rmse2 = self.rmse()
+
             self.parameters.append(self.lr.intercept_)  # intercept
             for i in range(len(self.lr.coef_)):         # weights
                 self.parameters.append(self.lr.coef_[i])
+
+            self.lassoParams.append(self.lasso.intercept_)  # intercept
+            for i in range(len(self.lasso.coef_)):  # weights
+                self.lassoParams.append(self.lasso.coef_[i])
+
+            for i in range(len(self.parameters)):
+                if self.lassoParams == 0.0:
+                    self.parameters[i] = 0.0
+
             self.weightArrays.append(self.parameters)
-            self.mseArray.append(rmse)
+            self.weightArrays.append(self.lassoParams)
             print("rmse-->", rmse)
-            print("weights", self.parameters)
+            print("rmse lasso-->", rmse2)
             print("*********")
             self.parameters = []
+            self.lassoParams = []
             count += 1
             if count == self.pieceNumber:
                 completed = True
-        return self.weightArrays, self.mseArray
+        return self.weightArrays
 
     def getData(self, manager):
         self.data_BigTrain = manager.data_training
         self.data_BigTest = manager.data_test
-        self.lasso = linear_model.Lasso()
         self.index = 0
         self.pieceNumber = len(self.data_BigTest) / 8
 
@@ -86,16 +98,16 @@ class LR:
     def getColumn(self, matrix, i):
         return [row[i] for row in matrix]
     
-    def get_correctness(self):
-        errors = []
-        for weight_index in range(len(self.weightArrays)):
-            test_data = self.data_BigTest[(weight_index * 8) : ((weight_index + 1) * 8)]
-            weights = self.weightArrays[weight_index]
-            #print(weights, weight_index, test_data, "\n\n")
-            error = HannesTool().get_err("Class", weights, test_data)
-            errors.append(error)
-        print("errors:", errors)
-        return sum(errors)/len(errors)
+    # def get_correctness(self):
+    #     errors = []
+    #     for weight_index in range(len(self.weightArrays)):
+    #         test_data = self.data_BigTest[(weight_index * 8): ((weight_index + 1) * 8)]
+    #         weights = self.weightArrays[weight_index]
+    #         #print(weights, weight_index, test_data, "\n\n")
+    #         error = HannesTool().get_err("Class", weights, test_data)
+    #         errors.append(error)
+    #     print("errors:", errors)
+    #     return sum(errors)/len(errors)
 
     def get_best_for_class(self):
         errors = []

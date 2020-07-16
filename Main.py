@@ -5,7 +5,7 @@
 
 from Model import LR
 from datamanipulator import Manager
-from hannestool import HannesTool
+from HannesTool import HannesTool
 
 
 class Main:
