@@ -1,11 +1,13 @@
 """csv ile uğraşılıp verinin alındığı modül"""
 import pandas as pd
+
 ######################
 ####Constants#########
 ######################
 DATA_DEST = "FinancialForecast\\Data\\BIST_100_Gecmis_Verileri_Haftalik.csv"
 TOTAL_LENGTH = pd.read_csv(DATA_DEST).shape[0]
 TR_DATA_LENGTH, TE_DATA_LENGTH = 16, 8
+BOUND = TR_DATA_LENGTH + TE_DATA_LENGTH  #tr-te sınırını belirleyen yer
 
 
 class Manager:
@@ -13,20 +15,18 @@ class Manager:
     def __init__(self):  # constructor
         self.data_training, self.data_test = self.prepare_data()
 
-
     def prepare_data(self):
         """Datayı oluşturuyor"""
         data_tr, data_te = [], []
-        bound = TR_DATA_LENGTH + TE_DATA_LENGTH - 2                         #tr-te sınırını belirleyen yer
         data = pd.read_csv(DATA_DEST)
-        for row_index in range(TOTAL_LENGTH - 1):                           #sonuncu zaten kullanilamaz
+        for row_index in range(TOTAL_LENGTH - 1):#sonuncu zaten kullanilamaz
             row_now = data.iloc[row_index]
-            target = data["Fark"].iloc[row_index + 1]
+            target = data["Fark %"].iloc[row_index + 1]
             piece_now = list(row_now.iloc[8:])
             piece_now.append(target)
-            if row_index % bound >= 0 and row_index % bound < 16:
+            if row_index % BOUND >= 0 and row_index % BOUND < 16:
                 data_tr.append(piece_now)
-            elif row_index % bound >= 16 and row_index % bound < bound:
+            elif row_index % BOUND >= 16 and row_index % BOUND < BOUND:
                 data_te.append(piece_now)
         return data_tr, data_te
 
