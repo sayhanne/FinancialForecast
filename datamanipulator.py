@@ -4,7 +4,7 @@ import pandas as pd
 ######################
 ####Constants#########
 ######################
-DATA_DEST = "FinancialForecast\\Data\\BIST_100_Gecmis_Verileri_Haftalik.csv"
+DATA_DEST = "Data\\BIST_100_Gecmis_Verileri_Haftalik.csv"
 TOTAL_LENGTH = pd.read_csv(DATA_DEST).shape[0]
 TR_DATA_LENGTH, TE_DATA_LENGTH = 16, 8
 BOUND = TR_DATA_LENGTH + TE_DATA_LENGTH  #tr-te sınırını belirleyen yer
@@ -29,10 +29,9 @@ class Manager:
             elif row_index % BOUND >= 16 and row_index % BOUND < BOUND:
                 data_te.append(piece_now)
         return data_tr, data_te
-
     def plot(self):
         """Datayı çiziyor"""
         data = pd.read_csv(DATA_DEST)
         data.iloc[:, 7:].plot()
 
-Manager()
+# Manager()
