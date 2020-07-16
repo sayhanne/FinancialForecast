@@ -5,7 +5,8 @@ class LR:
     def __init__(self):  # constructor
         self.pieceNumber = 0
         self.lr = None
-        # self.lasso = None
+        self.parameters = []
+        self.lasso = None
         self.tool = HannesTool()
         self.data_BigTrain = None
         self.data_BigTest = None
@@ -35,11 +36,18 @@ class LR:
             self.lr.fit(self.data, self.target)
             self.estimationForTest = self.lr.predict(self.data_test)
             rmse = self.rmse()
-            self.weightArrays.append(self.lr.coef_)
+            print("iteration-->", count + 1)
+            print("intercept-->", self.lr.intercept_)
+            print("coefficients-->", self.lr.coef_)
+            self.parameters.append(self.lr.intercept_)  # intercept
+            for i in range(len(self.lr.coef_)):         # weights
+                self.parameters.append(self.lr.coef_[i])
+            self.weightArrays.append(self.parameters)
             self.mseArray.append(rmse)
-            print("iteration-->", count+1)
-            print("rmse", rmse)
-            print("weights", self.lr.coef_)
+            print("rmse-->", rmse)
+            print("weights", self.parameters)
+            print("*********")
+            self.parameters = []
             count += 1
             if count == self.pieceNumber:
                 completed = True
@@ -48,6 +56,7 @@ class LR:
     def getData(self, manager):
         self.data_BigTrain = manager.data_training
         self.data_BigTest = manager.data_test
+        self.lasso = linear_model.Lasso()
         self.index = 0
         self.pieceNumber = len(self.data_BigTest) / 8
 
