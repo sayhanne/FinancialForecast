@@ -2,6 +2,7 @@ from HannesTool import HannesTool
 import random
 import math
 
+
 # import statistics
 
 
@@ -27,9 +28,10 @@ import math
 class LR:
 
     def __init__(self):  # constructor
+        self.pieceNumber = 0
         self.tool = HannesTool()
-        self.data_train = None
-        self.data_test = None
+        self.data_BigTrain = None
+        self.data_BigTest = None
         self.weightArrays = []
         self.mseArray = []
         self.numberOfPredictors = 0
@@ -41,7 +43,7 @@ class LR:
         self.data_test = None
         self.target_test = None
         self.index = None
-        self.learning_rate = 0.00000005
+        self.learning_rate = 0.000005
 
     def initializeParameters(self):
         arr = []
@@ -61,16 +63,16 @@ class LR:
             estimation += self.parameters[i + 1] * self.data[row][i]  # then all the remaining is added
         return estimation
 
-    def estimationCalculator(self):
-        for i in range(len(self.target)):
-            self.estimation[i] = self.estimationForRow(i)
-        return
-
     def estimationForRowTest(self, row):
         estimation = self.parameters[0]  # first the intercept is added
         for i in range(len(self.parameters) - 1):
             estimation += self.parameters[i + 1] * self.data_test[row][i]  # then all the remaining is added
         return estimation
+
+    def estimationCalculator(self):
+        for i in range(len(self.target)):
+            self.estimation[i] = self.estimationForRow(i)
+        return
 
     def estimationCalculatorTest(self):
         for i in range(len(self.target_test)):
@@ -89,6 +91,7 @@ class LR:
 
     def rmseForTrainPiece(self):
         mse = 0.0
+        self.estimationCalculator()
         for i in range(len(self.data)):
             mse += (self.target[i] - self.estimation[i]) ** 2
 
@@ -105,6 +108,7 @@ class LR:
     def gradientDescent(self, numOfPredictors):
         self.numberOfPredictors = numOfPredictors  # number of predictors can change
         completed = False
+        count = 0
         while not completed:
             self.data, self.target, self.data_test, self.target_test = self.getPiece()
             self.estimation = self.initializeEstimation()
@@ -113,24 +117,30 @@ class LR:
             mse_train = self.rmseForTrainPiece()
             min_mse = mse_train
             converged = False
+            print("calculating")
             while not converged:
                 for j in range(self.numberOfPredictors + 1):
                     self.parameters[j] = self.parameters[j] - self.learning_rate * self.costFunction(j)
                 mse_train = self.rmseForTrainPiece()
-                if min_mse > mse_train:
+                if min_mse > mse_train > 2.5:
+                    # print(min_mse)
                     min_mse = mse_train
-                    print(mse_train)
-                    print("*********")
                 else:
                     converged = True
+            print("final weights", self.parameters)
             print(self.rmseForTestPiece())
             print(self.target_test)
             print(self.estimation_test)
+            mse = 0.0
+            min_mse = 0.0
             # print(self.tool.get_err("Class", self.parameters))
             self.weightArrays.append(self.parameters)
             self.mseArray.append(self.rmseForTestPiece())
-            break
-        return
+            count += 1
+            if count == self.pieceNumber:
+                completed = True
+
+        return self.weightArrays, self.mseArray
 
     def getPiece(self):
         piece = []
@@ -140,9 +150,9 @@ class LR:
         x_test = None
         y_test = []
         for i in range(self.index * 16, (self.index + 1) * 16):
-            piece.append(self.data_train[i])
+            piece.append(self.data_BigTrain[i])
         for i in range(self.index * 8, (self.index + 1) * 8):
-            test_piece.append(self.data_test[i])
+            test_piece.append(self.data_BigTest[i])
         y = self.getColumn(piece, self.numberOfPredictors)  # last column
         y_test = self.getColumn(test_piece, self.numberOfPredictors)  # last column
         for row in piece:
@@ -159,6 +169,7 @@ class LR:
         return [row[i] for row in matrix]
 
     def getData(self, manager):
-        self.data_train = manager.data_training
-        self.data_test = manager.data_test
+        self.data_BigTrain = manager.data_training
+        self.data_BigTest = manager.data_test
         self.index = 0
+        self.pieceNumber = len(self.data_BigTest) / 8
