@@ -1,5 +1,7 @@
-# from HannesTool import HannesTool
+from HannesTool import HannesTool
 import random
+import math
+
 # import statistics
 
 
@@ -24,16 +26,22 @@ import random
 
 class LR:
 
-    def __init__(self, number):  # constructor
+    def __init__(self):  # constructor
+        self.tool = HannesTool()
+        self.data_train = None
+        self.data_test = None
         self.weightArrays = []
+        self.mseArray = []
         self.numberOfPredictors = 0
         self.parameters = []
-        self.target = []
-        self.managerObject = None
         self.estimation = []
-        self.data = []
-        self.learning_rate = 0.00000000005
-        self.batch_number = number
+        self.estimation_test = []
+        self.data = None
+        self.target = None
+        self.data_test = None
+        self.target_test = None
+        self.index = None
+        self.learning_rate = 0.00000005
 
     def initializeParameters(self):
         arr = []
@@ -50,12 +58,23 @@ class LR:
     def estimationForRow(self, row):
         estimation = self.parameters[0]  # first the intercept is added
         for i in range(len(self.parameters) - 1):
-            estimation += self.parameters[i+1] * self.data[row][i]   # then all the remaining is added
+            estimation += self.parameters[i + 1] * self.data[row][i]  # then all the remaining is added
         return estimation
 
     def estimationCalculator(self):
         for i in range(len(self.target)):
             self.estimation[i] = self.estimationForRow(i)
+        return
+
+    def estimationForRowTest(self, row):
+        estimation = self.parameters[0]  # first the intercept is added
+        for i in range(len(self.parameters) - 1):
+            estimation += self.parameters[i + 1] * self.data_test[row][i]  # then all the remaining is added
+        return estimation
+
+    def estimationCalculatorTest(self):
+        for i in range(len(self.target_test)):
+            self.estimation_test[i] = self.estimationForRowTest(i)
         return
 
     def costFunction(self, predictor):  # cost function is mse
@@ -65,39 +84,81 @@ class LR:
             if predictor == 0:
                 cost += (self.target[i] - self.estimation[i]) * -1
             else:
-                cost += (self.target[i] - self.estimation[i]) * -self.data[i][predictor-1]
+                cost += (self.target[i] - self.estimation[i]) * -self.data[i][predictor - 1]
         return 2 * cost / len(self.data)
 
-    def miniBatchGradientDescent(self, manager, numOfPredictors):
+    def rmseForTrainPiece(self):
+        mse = 0.0
+        for i in range(len(self.data)):
+            mse += (self.target[i] - self.estimation[i]) ** 2
+
+        return math.sqrt(mse / len(self.data))
+
+    def rmseForTestPiece(self):
+        mse = 0.0
+        self.estimationCalculatorTest()
+        for i in range(len(self.data_test)):
+            mse += (self.target_test[i] - self.estimation_test[i]) ** 2
+
+        return math.sqrt(mse / len(self.data_test))
+
+    def gradientDescent(self, numOfPredictors):
         self.numberOfPredictors = numOfPredictors  # number of predictors can change
-        self.managerObject = manager
-        converged = False
-        index = 0
-        count = 0
-        self.parameters = self.initializeParameters()
-        while not converged:
-            self.data, self.target = self.getDataPiece()
+        completed = False
+        while not completed:
+            self.data, self.target, self.data_test, self.target_test = self.getPiece()
             self.estimation = self.initializeEstimation()
-            for i in range(numOfPredictors + 1):
-                self.parameters[i] = self.parameters[i] - self.learning_rate * self.costFunction(i)
-            index += 1
-            if index == self.batch_number:
-                index = 0
-                count += 1
-                if count == 150:
-                    converged = True
-                    self.weightArrays.append(self.parameters)
-                    break
+            self.estimation_test = self.initializeEstimation()
+            self.parameters = self.initializeParameters()
+            mse_train = self.rmseForTrainPiece()
+            min_mse = mse_train
+            converged = False
+            while not converged:
+                for j in range(self.numberOfPredictors + 1):
+                    self.parameters[j] = self.parameters[j] - self.learning_rate * self.costFunction(j)
+                mse_train = self.rmseForTrainPiece()
+                if min_mse > mse_train:
+                    min_mse = mse_train
+                    print(mse_train)
+                    print("*********")
                 else:
-                    continue
-            else:
-                continue
+                    converged = True
+            print(self.rmseForTestPiece())
+            print(self.target_test)
+            print(self.estimation_test)
+            # print(self.tool.get_err("Class", self.parameters))
+            self.weightArrays.append(self.parameters)
+            self.mseArray.append(self.rmseForTestPiece())
+            break
         return
 
-    def getDataPiece(self):  # must return X matrix and Y array
-        x = []
+    def getPiece(self):
+        piece = []
+        test_piece = []
+        x = None
         y = []
-        for piece in self.managerObject.get_training_piece():
-            x.append(piece[0])
-            y.append(piece[1])
-        return x, y
+        x_test = None
+        y_test = []
+        for i in range(self.index * 16, (self.index + 1) * 16):
+            piece.append(self.data_train[i])
+        for i in range(self.index * 8, (self.index + 1) * 8):
+            test_piece.append(self.data_test[i])
+        y = self.getColumn(piece, self.numberOfPredictors)  # last column
+        y_test = self.getColumn(test_piece, self.numberOfPredictors)  # last column
+        for row in piece:
+            del row[self.numberOfPredictors]
+        for row in test_piece:
+            del row[self.numberOfPredictors]
+
+        x = piece
+        x_test = test_piece
+        self.index += 1
+        return x, y, x_test, y_test
+
+    def getColumn(self, matrix, i):
+        return [row[i] for row in matrix]
+
+    def getData(self, manager):
+        self.data_train = manager.data_training
+        self.data_test = manager.data_test
+        self.index = 0

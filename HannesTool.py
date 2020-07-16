@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-data_dest="proje\\data_for_model.csv"
+data_dest="Data\\data_for_model.csv"
 class HannesTool:
     def get_mean(self, Y):
         tot = 0
