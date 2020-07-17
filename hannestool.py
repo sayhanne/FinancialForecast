@@ -51,6 +51,8 @@ class HannesTool:
             return self.get_err_class(weights, data_test)
 
     def get_err_class(self, weights, data_test):
+        targetArr = []
+        estimationArr = []
         """tahminimizin class olarak doğruluk oranını hesaplıyor"""
         total = 0
         for test_sample in data_test:
@@ -63,6 +65,8 @@ class HannesTool:
                     estimation += test_sample[w_index[0] - 1] * w_index[1]
             #### hesap kısmı
             target = test_sample[-1]
+            targetArr.append(target)
+            estimationArr.append(estimation)
             if target * estimation > 0:
                 total += 1
-        return total/len(data_test)
+        return total/len(data_test), estimationArr, targetArr

@@ -1,6 +1,8 @@
 from hannestool import HannesTool
 from sklearn import linear_model
 import math
+
+
 class LR:
     def __init__(self):  # constructor
         self.pieceNumber = 0
@@ -43,7 +45,7 @@ class LR:
             rmse2 = self.rmse()
 
             self.parameters.append(self.lr.intercept_)  # intercept
-            for i in range(len(self.lr.coef_)):         # weights
+            for i in range(len(self.lr.coef_)):  # weights
                 self.parameters.append(self.lr.coef_[i])
 
             self.lassoParams.append(self.lasso.intercept_)  # intercept
@@ -98,7 +100,7 @@ class LR:
 
     def getColumn(self, matrix, i):
         return [row[i] for row in matrix]
-    
+
     # def get_correctness(self):
     #     errors = []
     #     for weight_index in range(len(self.weightArrays)):
@@ -113,15 +115,21 @@ class LR:
     def get_best_for_class(self):
         errors = []
         max_index = 0
+        estimation = []
+        target = []
         max_correctness = 0
+        max_estimation = []
         for weight_index in range(len(self.weightArrays)):
             weights = self.weightArrays[weight_index]
-            #print(weights, weight_index, test_data, "\n\n")
-            correctness = HannesTool().get_err("Class", weights, self.data_BigTest)
+            # print(weights, weight_index, test_data, "\n\n")
+            correctness, estimation, target = HannesTool().get_err("Class", weights, self.data_BigTest)
             print("correctness of weight array", weight_index, correctness)
-            if(max_correctness < correctness):
+            if max_correctness < correctness:
+                max_estimation = estimation
                 max_index = weight_index
                 max_correctness = correctness
             errors.append(correctness)
-        print("best", self.weightArrays[max_index],"correctness:", max_correctness)
-        return sum(errors)/len(errors)
+        print("test target", target)
+        print("best estimation", max_estimation)
+        print("best", self.weightArrays[max_index], "correctness:", max_correctness)
+        return sum(errors) / len(errors)
