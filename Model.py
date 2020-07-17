@@ -1,4 +1,4 @@
-from HannesTool import HannesTool
+from hannestool import HannesTool
 from sklearn import linear_model
 import math
 class LR:
