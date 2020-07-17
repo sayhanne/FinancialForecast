@@ -63,6 +63,7 @@ class LR:
             self.lassoParams = []
             count += 1
             if count == self.pieceNumber:
+                print("TRAINING DONE")
                 completed = True
         return self.weightArrays
 
@@ -117,6 +118,7 @@ class LR:
             weights = self.weightArrays[weight_index]
             #print(weights, weight_index, test_data, "\n\n")
             correctness = HannesTool().get_err("Class", weights, self.data_BigTest)
+            print("correctness of weight array", weight_index, correctness)
             if(max_correctness < correctness):
                 max_index = weight_index
                 max_correctness = correctness

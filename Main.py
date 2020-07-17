@@ -15,7 +15,7 @@ class Main:
         regression.getData(manager)
         regression.gradientDescent(5)
         class_error = regression.get_best_for_class()
-        print(class_error)
+        # print(class_error)
         return
 
 
