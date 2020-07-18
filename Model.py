@@ -21,6 +21,8 @@ class LR:
         self.target_test = None
         self.estimationForTest = None
         self.index = None
+        self.tr_target_class = []
+        self.te_target_class = []
 
     def rmse(self):
         mse = 0.0
@@ -101,6 +103,17 @@ class LR:
     def getColumn(self, matrix, i):
         return [row[i] for row in matrix]
 
+    def get_class_target(self):
+        for row in self.data_BigTrain:
+            if row[-1] > 0:
+                self.tr_target_class.append(1)
+            else:
+                self.tr_target_class.append(0)
+        for row in self.data_BigTest:
+            if row[-1] > 0:
+                self.te_target_class.append(1)
+            else:
+                self.te_target_class.append(0)
     # def get_correctness(self):
     #     errors = []
     #     for weight_index in range(len(self.weightArrays)):

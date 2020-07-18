@@ -13,8 +13,9 @@ class Main:
         manager = Manager()
         regression = LR()
         regression.getData(manager)
+        regression.get_class_target()
         regression.gradientDescent(5)
-        class_error = regression.get_best_for_class()
+        # class_error = regression.get_best_for_class()
         # print(class_error)
         return
 
