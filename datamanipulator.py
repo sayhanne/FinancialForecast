@@ -23,9 +23,9 @@ class Manager:
             target = data["Fark %"].iloc[row_index + 1]
             piece_now = list(row_now.iloc[8:])
             piece_now.append(target)
-            if row_index % BOUND >= 0 and row_index % BOUND < 16:
+            if 0 <= row_index % BOUND < 16:
                 data_tr.append(piece_now)
-            elif row_index % BOUND >= 16 and row_index % BOUND < BOUND:
+            elif 16 <= row_index % BOUND < BOUND:
                 data_te.append(piece_now)
         return data_tr, data_te
 

@@ -11,10 +11,8 @@ class Main:
 
     def run(self):
         manager = Manager()
-        model = Model(manager)
-        model.set_data(manager)
-        model.set_class_target()
-        model.gradient_descent(5)
+        model = Model(manager, 5)
+        model.estimate()
         model.regression.get_best_for_class()
         # class_error = regression.get_best_for_class()
         # print(class_error)
