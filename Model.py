@@ -2,17 +2,51 @@ from hannestool import HannesTool
 from sklearn import linear_model
 import math
 
+class Model:
+    def __init__(self, manager):
+        self.data_BigTrain = None
+        self.data_BigTest = None
+        self.tr_target_class = []
+        self.te_target_class = []
+        self.set_data(manager)
+        self.set_class_target()
+        self.regression = LR(self.data_BigTrain, self.data_BigTest)
 
+    def gradient_descent(self, predictors_number):
+        """gradient descent icin LR'a müraacaat eder"""
+        self.regression.gradient_descent(predictors_number)
+
+    def set_data(self, manager):
+        self.data_BigTrain = manager.data_training
+        self.data_BigTest = manager.data_test
+        self.index = 0
+        self.piece_number = len(self.data_BigTest) / 8
+
+    def set_class_target(self):
+        for row in self.data_BigTrain:
+            if row[-1] > 0:
+                self.tr_target_class.append(1)
+            else:
+                self.tr_target_class.append(0)
+        for row in self.data_BigTest:
+            if row[-1] > 0:
+                self.te_target_class.append(1)
+            else:
+                self.te_target_class.append(0)
+##########################################################################################
+##########################################################################################
+##########################################################################################
 class LR:
-    def __init__(self):  # constructor
-        self.pieceNumber = 0
+    """Lineer regression yapması için sınıf"""
+    def __init__(self, data_tr, data_te):  # constructor
+        self.data_BigTrain = data_tr
+        self.data_BigTest = data_te
+        self.piece_number = 0
         self.lr = None
         self.parameters = []
         self.lasso = None
         self.lassoParams = []
         self.tool = HannesTool()
-        self.data_BigTrain = None
-        self.data_BigTest = None
         self.weightArrays = []
         self.numberOfPredictors = 0
         self.data = None
@@ -21,8 +55,8 @@ class LR:
         self.target_test = None
         self.estimationForTest = None
         self.index = None
-        self.tr_target_class = []
-        self.te_target_class = []
+        self.index = 0
+        self.piece_number = len(self.data_BigTest) / 8
 
     def rmse(self):
         mse = 0.0
@@ -30,7 +64,7 @@ class LR:
             mse += (self.target_test[i] - self.estimationForTest[i]) ** 2
         return math.sqrt(mse / len(self.target_test))
 
-    def gradientDescent(self, numOfPredictors):
+    def gradient_descent(self, numOfPredictors):
         self.numberOfPredictors = numOfPredictors  # number of predictors can change
         completed = False
         count = 0
@@ -66,16 +100,12 @@ class LR:
             self.parameters = []
             self.lassoParams = []
             count += 1
-            if count == self.pieceNumber:
+            if count == self.piece_number:
                 print("TRAINING DONE")
                 completed = True
         return self.weightArrays
 
-    def getData(self, manager):
-        self.data_BigTrain = manager.data_training
-        self.data_BigTest = manager.data_test
-        self.index = 0
-        self.pieceNumber = len(self.data_BigTest) / 8
+    
 
     def getPiece(self):
         piece = []
@@ -103,17 +133,6 @@ class LR:
     def getColumn(self, matrix, i):
         return [row[i] for row in matrix]
 
-    def get_class_target(self):
-        for row in self.data_BigTrain:
-            if row[-1] > 0:
-                self.tr_target_class.append(1)
-            else:
-                self.tr_target_class.append(0)
-        for row in self.data_BigTest:
-            if row[-1] > 0:
-                self.te_target_class.append(1)
-            else:
-                self.te_target_class.append(0)
     # def get_correctness(self):
     #     errors = []
     #     for weight_index in range(len(self.weightArrays)):
