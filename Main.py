@@ -6,7 +6,6 @@
 from Model import Model
 from datamanipulator import Manager
 
-
 class Main:
 
     def run(self):
@@ -14,6 +13,11 @@ class Main:
         model = Model(manager, 5)
         model.estimate()
         model.regression.get_best_for_class()
+        print("###################")
+        model.classification.best_classification()
+
+        # class_error = regression.get_best_for_class()
+        # print(class_error)
         return
 
 

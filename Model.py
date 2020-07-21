@@ -27,8 +27,11 @@ class Logistic:
     def __init__(self, data_tr, data_te, number, predictor):  # constructor
         self.data_BigTrain = data_tr
         self.data_BigTest = data_te
+        self.logisticObjects = []
         self.logistic = None
+        self.tool = HannesTool()
         self.data = None
+        self.dataForTest = None
         self.index = 0
         self.target = None
         self.data_test = None
@@ -36,6 +39,34 @@ class Logistic:
         self.estimationForTest = None
         self.piece_number = number
         self.numberOfPredictors = predictor
+
+    def prepareForTest(self):
+        targets = []
+        X = []
+        for i in range(len(self.data_BigTest)):
+            X.append([])
+            for a in range(len(self.data_BigTest[0])):
+                if a == self.numberOfPredictors:
+                    if self.data_BigTest[i][a] > 0:
+                        targets.append(1)
+                    else:
+                        targets.append(0)
+                else:
+                    X[i].append(self.data_BigTest[i][a])
+        return X, targets
+
+    def best_classification(self):
+        X, y = self.prepareForTest()
+        max_index = 0
+        max_odd = 0.0
+        for i in range(len(self.logisticObjects)):
+            index = i
+            odd = self.tool.get_err_class_logistic(self.logisticObjects[i], X, y)
+            if max_odd < odd:
+                max_odd = odd
+                max_index = index
+            # print("classification odd", i+1, odd)
+        print("best odd for classification", max_odd)
 
     def classification(self):
         completed = False
@@ -46,6 +77,7 @@ class Logistic:
             self.logistic = linear_model.LogisticRegression()
             self.logistic.fit(self.data, self.target)
             self.estimationForTest = self.logistic.predict(self.data_test)
+            self.logisticObjects.append(self.logistic)
             rmse = self.rmse()
             print("rmse for classification", rmse)
             print("*********")

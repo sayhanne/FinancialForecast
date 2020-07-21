@@ -70,3 +70,11 @@ class HannesTool:
             if target * estimation > 0:
                 total += 1
         return total/len(data_test), estimationArr, targetArr
+
+    def get_err_class_logistic(self, logistic, X, target):
+        total = 0.0
+        estimations = logistic.predict(X)
+        for i in range(len(target)):
+            if target[i] == estimations[i]:
+                total += 1
+        return total / len(target)
