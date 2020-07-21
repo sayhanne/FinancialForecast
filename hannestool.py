@@ -74,7 +74,10 @@ class HannesTool:
     def get_err_class_logistic(self, logistic, X, target):
         total = 0.0
         estimations = logistic.predict(X)
+        est_arr = []
         for i in range(len(target)):
             if target[i] == estimations[i]:
                 total += 1
-        return total / len(target)
+        for i in estimations:
+            est_arr.append(i)
+        return total / len(target), est_arr

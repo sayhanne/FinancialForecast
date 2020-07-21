@@ -10,7 +10,7 @@ class Main:
 
     def run(self):
         manager = Manager()
-        model = Model(manager, 5)
+        model = Model(manager, 10)
         model.estimate()
         model.regression.get_best_for_class()
         print("###################")

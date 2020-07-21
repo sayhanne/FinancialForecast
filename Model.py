@@ -8,7 +8,7 @@ class Model:
     """Modülün ana kısmı"""
     def __init__(self, manager, predictor):
         self.manager = manager
-        self.piece_number = len(self.manager.data_test)/8
+        self.piece_number = len(self.manager.data_test)/5
         self.regression = LR(self.manager.data_training, self.manager.data_test, self.piece_number, predictor)
         self.classification = Logistic(self.manager.data_training, self.manager.data_test, self.piece_number, predictor)
 
@@ -58,14 +58,19 @@ class Logistic:
     def best_classification(self):
         X, y = self.prepareForTest()
         max_index = 0
+        max_estimation = []
+        estimation = []
         max_odd = 0.0
         for i in range(len(self.logisticObjects)):
             index = i
-            odd = self.tool.get_err_class_logistic(self.logisticObjects[i], X, y)
+            odd, estimation = self.tool.get_err_class_logistic(self.logisticObjects[i], X, y)
             if max_odd < odd:
+                max_estimation = estimation
                 max_odd = odd
                 max_index = index
             # print("classification odd", i+1, odd)
+        print("target", y)
+        print("best estimation", max_estimation)
         print("best odd for classification", max_odd)
 
     def classification(self):
@@ -116,14 +121,14 @@ class Logistic:
         y = []
         x_test = None
         y_test = []
-        for i in range(self.index * 16, (self.index + 1) * 16):
+        for i in range(self.index * 5, (self.index + 1) * 5):
             piece.append([])
             for a in range(len(self.data_BigTrain[0])):
                 piece[index].append(self.data_BigTrain[i][a])
             index += 1
 
         index = 0
-        for i in range(self.index * 8, (self.index + 1) * 8):
+        for i in range(self.index * 5, (self.index + 1) * 5):
             test_piece.append([])
             for a in range(len(self.data_BigTest[0])):
                 test_piece[index].append(self.data_BigTest[i][a])
@@ -220,14 +225,14 @@ class LR:
         y = []
         x_test = None
         y_test = []
-        for i in range(self.index * 16, (self.index + 1) * 16):
+        for i in range(self.index * 5, (self.index + 1) * 5):
             piece.append([])
             for a in range(len(self.data_BigTrain[0])):
                 piece[index].append(self.data_BigTrain[i][a])
             index += 1
 
         index = 0
-        for i in range(self.index * 8, (self.index + 1) * 8):
+        for i in range(self.index * 5, (self.index + 1) * 5):
             test_piece.append([])
             for a in range(len(self.data_BigTest[0])):
                 test_piece[index].append(self.data_BigTest[i][a])
