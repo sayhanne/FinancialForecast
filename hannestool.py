@@ -1,5 +1,6 @@
 """Yardımcı Toollar için kullanılan bir modül"""
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 class HannesTool:
     """Tek classı"""
@@ -33,7 +34,7 @@ class HannesTool:
                     estimation = weights[w_index]
                 else:
                     estimation += test_sample[w_index - 1] * weights[w_index]
-            #rss hesap kısmı
+            # rss hesap kısmı
             target = test_sample[-1]
             tss += self.get_tss(target)
             rss += (target - estimation) ** 2
@@ -69,7 +70,7 @@ class HannesTool:
             estimationArr.append(estimation)
             if target * estimation > 0:
                 total += 1
-        return total/len(data_test), estimationArr, targetArr
+        return total / len(data_test), estimationArr, targetArr
 
     def get_err_class_logistic(self, logistic, X, target):
         total = 0.0
@@ -81,3 +82,13 @@ class HannesTool:
         for i in estimations:
             est_arr.append(i)
         return total / len(target), est_arr
+
+    def plot(self, estimations, target, index):
+        if index == 0:
+            plt.plot(estimations, label="estimations")
+            plt.plot(target, label="targets")
+        elif index == 1:
+            plt.plot(estimations, label="estimations", linestyle="--")
+            plt.plot(target, label="targets")
+        plt.legend()
+        plt.show()

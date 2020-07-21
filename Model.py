@@ -69,6 +69,7 @@ class Logistic:
                 max_odd = odd
                 max_index = index
             # print("classification odd", i+1, odd)
+        self.tool.plot(max_estimation, y, 1)
         print("target", y)
         print("best estimation", max_estimation)
         print("best odd for classification", max_odd)
@@ -280,6 +281,7 @@ class LR:
                 max_index = weight_index
                 max_correctness = correctness
             errors.append(correctness)
+        HannesTool().plot(max_estimation, target, 0)
         print("test target", target)
         print("best estimation", max_estimation)
         print("best", self.weightArrays[max_index], "correctness:", max_correctness)
