@@ -14,8 +14,6 @@ class Main:
         model = Model(manager, 5)
         model.estimate()
         model.regression.get_best_for_class()
-        # class_error = regression.get_best_for_class()
-        # print(class_error)
         return
 
 

@@ -1,16 +1,19 @@
-from hannestool import HannesTool
-from sklearn import linear_model
+"""Makine öğreniminin model bölümü"""
 import math
+from sklearn import linear_model
+from hannestool import HannesTool
 
 
 class Model:
+    """Modülün ana kısmı"""
     def __init__(self, manager, predictor):
         self.manager = manager
-        self.piece_number = len(self.manager.data_test) / 8
+        self.piece_number = len(self.manager.data_test)/8
         self.regression = LR(self.manager.data_training, self.manager.data_test, self.piece_number, predictor)
         self.classification = Logistic(self.manager.data_training, self.manager.data_test, self.piece_number, predictor)
 
     def estimate(self):
+        """tüm modeller burada çalışıyor"""
         self.regression.gradient_descent()
         print("#########")
         self.classification.classification()
@@ -20,6 +23,7 @@ class Model:
 ##########################################################################################
 ##########################################################################################
 class Logistic:
+    """Logistic Regression yapan model"""
     def __init__(self, data_tr, data_te, number, predictor):  # constructor
         self.data_BigTrain = data_tr
         self.data_BigTest = data_te
@@ -112,7 +116,7 @@ class Logistic:
 
 
 class LR:
-
+    """Linear Regression yapan model"""
     def __init__(self, data_tr, data_te, number, predictor):  # constructor
         self.data_BigTrain = data_tr
         self.data_BigTest = data_te
